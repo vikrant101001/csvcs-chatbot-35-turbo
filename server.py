@@ -64,10 +64,7 @@ def ask():
       user_question = reqData['question']
       if pointer == 1:
         location = user_question
-        latitude, longitude = geocode(
-            location,
-            'pk.eyJ1IjoiZXZ2YWhlYWx0aCIsImEiOiJjbGp5anJjY2IwNGlnM2RwYmtzNGR0aGduIn0.Nx4jv-saalq2sdw9qKuvbQ'
-        )
+        latitude, longitude = geocode(location, os.environ["MAP_KEY"])
       question = user_question
 
       user_history = reqData['history']

@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import sys
 import faiss
@@ -12,6 +11,7 @@ from langchain.llms import OpenAIChat
 from langchain.prompts import Prompt
 import requests
 import os
+
 
 def geocode(address, access_token):
   if not address:
@@ -27,11 +27,10 @@ def geocode(address, access_token):
     return None, None
 
 
-
 def train():
 
-    # Check there is data fetched from the database
-  
+  # Check there is data fetched from the database
+
   trainingData = list(Path("training/facts/").glob("**/*.*"))
 
   # Check there is data in the trainingData folder
@@ -47,15 +46,15 @@ def train():
       print(f"Add {f.name} to dataset")
       data.append(f.read())
 
-  textSplitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
+  textSplitter = RecursiveCharacterTextSplitter(chunk_size=2000,
+                                                chunk_overlap=0)
 
   docs = []
   for sets in data:
     docs.extend(textSplitter.split_text(sets))
   embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
-  store = FAISS.from_texts(
-      docs, embeddings)
-  
+  store = FAISS.from_texts(docs, embeddings)
+
   faiss.write_index(store.index, "training.index")
   store.index = None
 
@@ -77,12 +76,11 @@ def runPrompt():
   prompt = Prompt(template=promptTemplate,
                   input_variables=["history", "context", "question"])
 
-  llmChain = LLMChain(
-      prompt=prompt,
-      llm=OpenAIChat(
-          temperature=0.5,
-          model_name='gpt-3.5-turbo',          openai_api_key=os.environ["OPENAI_API_KEY"])
-  )
+  llmChain = LLMChain(prompt=prompt,
+                      llm=OpenAIChat(
+                          temperature=0.5,
+                          model_name='gpt-3.5-turbo',
+                          openai_api_key=os.environ["OPENAI_API_KEY"]))
 
   def onMessage(question, history):
     # Check if the question is related to the user's location
@@ -90,15 +88,11 @@ def runPrompt():
       location = input(
           "Please provide your complete location so that we can find the nearest required professional for you: "
       )
-      latitude, longitude = geocode(
-          location,
-          'pk.eyJ1IjoiZXZ2YWhlYWx0aCIsImEiOiJjbGp5anJjY2IwNGlnM2RwYmtzNGR0aGduIn0.Nx4jv-saalq2sdw9qKuvbQ'
-      )
+      latitude, longitude = geocode(location, os.environ["MAP_KEY"])
       # Store the latitude and longitude in your database
       # Perform actions related to address-based functionality
       # Sort professionals based on proximity using latitude and longitude
-    
-         
+
     docs = store.similarity_search(question)
     contexts = []
     for i, doc in enumerate(docs):
