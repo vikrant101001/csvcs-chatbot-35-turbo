@@ -29,6 +29,8 @@ def geocode(address, access_token):
     return None, None
 
 
+#added to github
+
 index = faiss.read_index("training.index")
 
 with open("faiss.pkl", "rb") as f:
@@ -63,8 +65,8 @@ def ask():
       if pointer == 1:
         location = user_question
         latitude, longitude = geocode(
-          location,
-          'pk.eyJ1IjoiZXZ2YWhlYWx0aCIsImEiOiJjbGp5anJjY2IwNGlnM2RwYmtzNGR0aGduIn0.Nx4jv-saalq2sdw9qKuvbQ'
+            location,
+            'pk.eyJ1IjoiZXZ2YWhlYWx0aCIsImEiOiJjbGp5anJjY2IwNGlnM2RwYmtzNGR0aGduIn0.Nx4jv-saalq2sdw9qKuvbQ'
         )
       question = user_question
 
@@ -73,8 +75,9 @@ def ask():
       # Rest of the code...
       llmChain = LLMChain(prompt=prompt,
                           llm=OpenAIChat(
-                            temperature=0.5,
-                            model_name="gpt-3.5-turbo",                            openai_api_key=os.environ["OPENAI_API_KEY"]))
+                              temperature=0.5,
+                              model_name="gpt-3.5-turbo",
+                              openai_api_key=os.environ["OPENAI_API_KEY"]))
 
       def onMessage(question, history):
         pointer = 0
@@ -87,31 +90,32 @@ def ask():
         for i, doc in enumerate(docs):
           contexts.append(f"Context {i}:\n{doc.page_content}")
           if pointer == 0:
-            answer = llmChain.predict(question=question,                                      context="\n\n".join(contexts),
+            answer = llmChain.predict(question=question,
+                                      context="\n\n".join(contexts),
                                       history=history)
         return answer
 
       return jsonify({
-        "answer":
-        onMessage(reqData['question'], reqData['history']),
-        "success":
-        True
+          "answer":
+          onMessage(reqData['question'], reqData['history']),
+          "success":
+          True
       })
 
     except:
 
       return jsonify({
-        "answer": None,
-        "success": False,
-        "message": "Error"
+          "answer": None,
+          "success": False,
+          "message": "Error"
       }), 400
 
   else:
     print("secret doesnt match")
     return jsonify({
-      "answer": None,
-      "success": False,
-      "message": "Unauthorised"
+        "answer": None,
+        "success": False,
+        "message": "Unauthorised"
     })
 
 
